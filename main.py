@@ -1,0 +1,235 @@
+# embedding_in_qt5.py --- Simple Qt5 application embedding matplotlib canvases
+#
+# Copyright (C) 2005 Florent Rougon
+#               2006 Darren Dale
+#               2015 Jens H Nielsen
+#
+# This file is an example program for matplotlib. It may be used and
+# modified with no restriction; raw copies as well as modified versions
+# may be distributed without limitation.
+
+from __future__ import unicode_literals
+import sys
+import os
+import random
+import matplotlib
+# Make sure that we are using QT5
+matplotlib.use('Qt5Agg')
+from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5.QtCore import Qt
+
+from numpy import arange, sin, pi, linspace
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+
+progname = os.path.basename(sys.argv[0])
+progversion = "0.1"
+
+class LabeledInputLine(QtWidgets.QWidget):
+    def __init__(self, label_name, parent = None):
+        QtWidgets.QWidget.__init__(self)
+        layout = QtWidgets.QHBoxLayout(self)
+        self.label = QtWidgets.QLabel(self)
+        self.label.setText(label_name)
+        self.edit = QtWidgets.QLineEdit(self)
+        layout.addWidget(self.label)
+        layout.addWidget(self.edit)
+
+
+class InputWidget(QtWidgets.QWidget):
+    valueChanged = QtCore.Signal(int)
+    def __init__(self, label_name, slider_minimum, slider_maximum, default_value = 0, parent = None):
+        QtWidgets.QWidget.__init__(self)
+        layout = QtWidgets.QVBoxLayout(self)
+
+        self.input_line = LabeledInputLine(label_name, self)
+        layout.addWidget(self.input_line)
+
+        self.slider = QtWidgets.QSlider(Qt.Horizontal)
+        self.slider.setTickInterval(1)
+        self.slider.setSingleStep(1)
+        self.slider.setMinimum(slider_minimum)
+        self.slider.setMaximum(slider_maximum)
+        self.input_line.edit.textChanged.connect(self.line_edit_changed)
+        self.slider.valueChanged.connect(self.slider_changed)
+        layout.addWidget(self.slider)
+
+        self.slider.setValue(default_value)
+        self.input_line.edit.setText(str(default_value))
+
+    def slider_changed(self, new_value):
+        self.input_line.edit.setText(str(new_value))
+        self.valueChanged.emit(new_value)
+
+    def line_edit_changed(self, new_value):
+        if new_value is None or new_value is '':
+            new_value = 0
+        new_value = float(new_value)
+        self.slider.setValue(new_value)
+        self.valueChanged.emit(new_value)
+
+class MyMplCanvas(FigureCanvas):
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+
+        self.compute_initial_figure()
+
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+
+        FigureCanvas.setSizePolicy(self,
+                                   QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+
+    def compute_initial_figure(self):
+        pass
+
+
+class MyStaticMplCanvas(MyMplCanvas):
+    """Simple canvas with a sine plot."""
+
+    def compute_initial_figure(self):
+        t = arange(0.0, 3.0, 0.01)
+        s = sin(2*pi*t)
+        self.axes.plot(t, s)
+
+
+class MyDynamicMplCanvas(MyMplCanvas):
+    """A canvas that updates itself every second with a new plot."""
+
+    def __init__(self, *args, **kwargs):
+        MyMplCanvas.__init__(self, *args, **kwargs)
+        # timer = QtCore.QTimer(self)
+        # timer.timeout.connect(self.update_figure)
+        # timer.start(1000)
+        self.a = 1 # plotting the curves for
+        self.b = 1 # different values of a/b
+        self.A = 1
+        self.B = 1
+        self.delta = pi / 2;
+        self.t = linspace(-pi, pi, 360)
+
+    def compute_initial_figure(self):
+        self.axes.plot([0, 1, 2, 3], [1, 2, 0, 4], 'r')
+
+    def update_figure(self):
+        # Build a list of 4 random integers between 0 and 10 (both inclusive)
+        #for i in range(0,4):
+        x = self.A * sin(self.a * self.t + self.delta)
+        y = self.B * sin(self.b * self.t)
+        self.axes.cla()
+        # self.axes.plot([0, 1, 2, 3], x, 'r')
+        self.axes.plot(x, y, 'g')
+        self.draw()
+
+    def update_delta(self, new_delta):
+        self.delta = new_delta
+        self.update_figure()
+
+    def update_a(self, new_a):
+        self.a = new_a
+        self.update_figure()
+
+    def update_b(self, new_b):
+        self.b = new_b
+        self.update_figure()
+
+    def update_A(self, new_A):
+        self.A = new_A
+        self.update_figure()
+
+    def update_B(self, new_B):
+        self.B = new_B
+        self.update_figure()
+
+class ApplicationWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        QtWidgets.QMainWindow.__init__(self)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setWindowTitle("application main window")
+
+        self.file_menu = QtWidgets.QMenu('&File', self)
+        self.file_menu.addAction('&Quit', self.fileQuit,
+                                 QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
+        self.menuBar().addMenu(self.file_menu)
+
+        self.help_menu = QtWidgets.QMenu('&Help', self)
+        self.menuBar().addSeparator()
+        self.menuBar().addMenu(self.help_menu)
+
+        self.help_menu.addAction('&About', self.about)
+
+        self.main_widget = QtWidgets.QWidget(self)
+
+        l = QtWidgets.QVBoxLayout(self.main_widget)
+        dc = MyDynamicMplCanvas(self.main_widget, width=5, height=4, dpi=100)
+        l.addWidget(dc)
+        delta_widget = InputWidget("Delta", 0, 360, 0, self.main_widget)
+        delta_widget.valueChanged.connect(dc.update_delta)
+        l.addWidget(delta_widget)
+        a_widget = InputWidget("a", -10, 10, 1, self.main_widget)
+        a_widget.valueChanged.connect(dc.update_a)
+        l.addWidget(a_widget)
+        b_widget = InputWidget("b", -10, 10, 1, self.main_widget)
+        b_widget.valueChanged.connect(dc.update_b)
+        l.addWidget(b_widget)
+        A_widget = InputWidget("A", -10, 10, 1, self.main_widget)
+        A_widget.valueChanged.connect(dc.update_A)
+        l.addWidget(A_widget)
+        B_widget = InputWidget("B", -10, 10, 1, self.main_widget)
+        B_widget.valueChanged.connect(dc.update_B)
+        l.addWidget(B_widget)
+
+        self.main_widget.setFocus()
+        self.setCentralWidget(self.main_widget)
+
+        self.statusBar().showMessage("Lissajous curves visualization", 2000)
+
+    def delta_slider_changed(self, delta):
+        self.update_text_delta(delta)
+        self.update_display_delta(delta)
+
+    def delta_line_edit_changed(self, delta):
+        if delta is None or delta is '':
+            delta = 0
+        delta = float(delta)
+        while (delta > 360):
+            delta -= 360
+        while (delta < 0):
+            delta += 360
+        self.update_slider_delta(delta)
+        self.update_display_delta(delta)
+
+    def fileQuit(self):
+        self.close()
+
+    def closeEvent(self, ce):
+        self.fileQuit()
+
+    def about(self):
+        QtWidgets.QMessageBox.about(self, "About",
+                                    """embedding_in_qt5.py example
+Copyright 2005 Florent Rougon, 2006 Darren Dale, 2015 Jens H Nielsen
+
+This program is a simple example of a Qt5 application embedding matplotlib
+canvases.
+
+It may be used and modified with no restriction; raw copies as well as
+modified versions may be distributed without limitation.
+
+This is modified from the embedding in qt4 example to show the difference
+between qt4 and qt5"""
+                                )
+
+
+qApp = QtWidgets.QApplication(sys.argv)
+
+aw = ApplicationWindow()
+aw.setWindowTitle("%s" % progname)
+aw.show()
+sys.exit(qApp.exec_())
+#qApp.exec_()
