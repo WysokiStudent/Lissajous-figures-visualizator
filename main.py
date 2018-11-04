@@ -68,6 +68,28 @@ class InputWidget(QtWidgets.QWidget):
         self.slider.setValue(new_value)
         self.valueChanged.emit(new_value)
 
+class Options(QtWidgets.QWidget):
+    def __init__(self, canvas, parent = None):
+        QtWidgets.QWidget.__init__(self)
+        l = QtWidgets.QVBoxLayout(self)
+        delta_widget = InputWidget("Delta", 0, 360, 0, self)
+        delta_widget.valueChanged.connect(canvas.update_delta)
+        l.addWidget(delta_widget)
+        a_widget = InputWidget("a", -10, 10, 1, self)
+        a_widget.valueChanged.connect(canvas.update_a)
+        l.addWidget(a_widget)
+        b_widget = InputWidget("b", -10, 10, 1, self)
+        b_widget.valueChanged.connect(canvas.update_b)
+        l.addWidget(b_widget)
+        A_widget = InputWidget("A", -10, 10, 1, self)
+        A_widget.valueChanged.connect(canvas.update_A)
+        l.addWidget(A_widget)
+        B_widget = InputWidget("B", -10, 10, 1, self)
+        B_widget.valueChanged.connect(canvas.update_B)
+        l.addWidget(B_widget)
+
+
+
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
@@ -165,24 +187,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.main_widget = QtWidgets.QWidget(self)
 
-        l = QtWidgets.QVBoxLayout(self.main_widget)
+        l = QtWidgets.QHBoxLayout(self.main_widget)
         dc = MyDynamicMplCanvas(self.main_widget, width=5, height=4, dpi=100)
+        options = Options(dc)
         l.addWidget(dc)
-        delta_widget = InputWidget("Delta", 0, 360, 0, self.main_widget)
-        delta_widget.valueChanged.connect(dc.update_delta)
-        l.addWidget(delta_widget)
-        a_widget = InputWidget("a", -10, 10, 1, self.main_widget)
-        a_widget.valueChanged.connect(dc.update_a)
-        l.addWidget(a_widget)
-        b_widget = InputWidget("b", -10, 10, 1, self.main_widget)
-        b_widget.valueChanged.connect(dc.update_b)
-        l.addWidget(b_widget)
-        A_widget = InputWidget("A", -10, 10, 1, self.main_widget)
-        A_widget.valueChanged.connect(dc.update_A)
-        l.addWidget(A_widget)
-        B_widget = InputWidget("B", -10, 10, 1, self.main_widget)
-        B_widget.valueChanged.connect(dc.update_B)
-        l.addWidget(B_widget)
+        l.addWidget(options)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
