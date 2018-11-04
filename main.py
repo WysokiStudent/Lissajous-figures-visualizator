@@ -22,7 +22,7 @@ from numpy import arange, sin, pi, linspace
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-progname = os.path.basename(sys.argv[0])
+progname = os.path.basename("Lissajous")
 progversion = "0.1"
 
 class LabeledInputLine(QtWidgets.QWidget):
