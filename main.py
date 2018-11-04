@@ -1,13 +1,3 @@
-# embedding_in_qt5.py --- Simple Qt5 application embedding matplotlib canvases
-#
-# Copyright (C) 2005 Florent Rougon
-#               2006 Darren Dale
-#               2015 Jens H Nielsen
-#
-# This file is an example program for matplotlib. It may be used and
-# modified with no restriction; raw copies as well as modified versions
-# may be distributed without limitation.
-
 from __future__ import unicode_literals
 import sys
 import os
@@ -119,23 +109,11 @@ class MyMplCanvas(FigureCanvas):
         pass
 
 
-class MyStaticMplCanvas(MyMplCanvas):
-    """Simple canvas with a sine plot."""
-
-    def compute_initial_figure(self):
-        t = arange(0.0, 3.0, 0.01)
-        s = sin(2*pi*t)
-        self.axes.plot(t, s)
-
-
 class MyDynamicMplCanvas(MyMplCanvas):
     """A canvas that updates itself every second with a new plot."""
 
     def __init__(self, *args, **kwargs):
         MyMplCanvas.__init__(self, *args, **kwargs)
-        # timer = QtCore.QTimer(self)
-        # timer.timeout.connect(self.update_figure)
-        # timer.start(1000)
         self.a = 1 # plotting the curves for
         self.b = 1 # different values of a/b
         self.A = 1
@@ -149,12 +127,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.axes.plot(x, y, 'g')
 
     def update_figure(self):
-        # Build a list of 4 random integers between 0 and 10 (both inclusive)
-        #for i in range(0,4):
         x = self.A * sin(self.a * self.t + self.delta)
         y = self.B * sin(self.b * self.t)
         self.axes.cla()
-        # self.axes.plot([0, 1, 2, 3], x, 'r')
         self.axes.plot(x, y, 'g')
         self.draw()
 
