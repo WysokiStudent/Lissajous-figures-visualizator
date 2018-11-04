@@ -144,7 +144,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.t = linspace(-pi, pi, 360)
 
     def compute_initial_figure(self):
-        self.axes.plot([0, 1, 2, 3], [1, 2, 0, 4], 'r')
+        x = sin(linspace(-pi, pi, 360))
+        y = sin(linspace(-pi, pi, 360))
+        self.axes.plot(x, y, 'g')
 
     def update_figure(self):
         # Build a list of 4 random integers between 0 and 10 (both inclusive)
