@@ -69,26 +69,34 @@ class InputWidget(QtWidgets.QWidget):
         self.valueChanged.emit(new_value)
 
 class Options(QtWidgets.QWidget):
-    def __init__(self, canvas, parent = None):
+    def __init__(self, parent = None):
         QtWidgets.QWidget.__init__(self)
         l = QtWidgets.QVBoxLayout(self)
-        delta_widget = InputWidget("Delta", 0, 360, 0, self)
-        delta_widget.valueChanged.connect(canvas.update_delta)
-        l.addWidget(delta_widget)
-        a_widget = InputWidget("a", -10, 10, 1, self)
-        a_widget.valueChanged.connect(canvas.update_a)
-        l.addWidget(a_widget)
-        b_widget = InputWidget("b", -10, 10, 1, self)
-        b_widget.valueChanged.connect(canvas.update_b)
-        l.addWidget(b_widget)
-        A_widget = InputWidget("A", -10, 10, 1, self)
-        A_widget.valueChanged.connect(canvas.update_A)
-        l.addWidget(A_widget)
-        B_widget = InputWidget("B", -10, 10, 1, self)
-        B_widget.valueChanged.connect(canvas.update_B)
-        l.addWidget(B_widget)
+        self.delta_widget = InputWidget("Delta", 0, 360, 0, self)
+        l.addWidget(self.delta_widget)
+        self.a_widget = InputWidget("a", -10, 10, 1, self)
+        l.addWidget(self.a_widget)
+        self.b_widget = InputWidget("b", -10, 10, 1, self)
+        l.addWidget(self.b_widget)
+        self.A_widget = InputWidget("A", -10, 10, 1, self)
+        l.addWidget(self.A_widget)
+        self.B_widget = InputWidget("B", -10, 10, 1, self)
+        l.addWidget(self.B_widget)
 
+    def add_new_delta_handler(self, new_delta_handler):
+        self.delta_widget.valueChanged.connect(new_delta_handler)
 
+    def add_new_a_handler(self, new_a_handler):
+        self.a_widget.valueChanged.connect(new_a_handler)
+
+    def add_new_b_handler(self, new_b_handler):
+        self.b_widget.valueChanged.connect(new_b_handler)
+
+    def add_new_A_handler(self, new_A_handler):
+        self.A_widget.valueChanged.connect(new_A_handler)
+
+    def add_new_B_handler(self, new_B_handler):
+        self.B_widget.valueChanged.connect(new_B_handler)
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -190,6 +198,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         l = QtWidgets.QHBoxLayout(self.main_widget)
         dc = MyDynamicMplCanvas(self.main_widget, width=5, height=4, dpi=100)
         options = Options(dc)
+        options.add_new_delta_handler(dc.update_delta)
+        options.add_new_a_handler(dc.update_a)
+        options.add_new_b_handler(dc.update_b)
+        options.add_new_A_handler(dc.update_A)
+        options.add_new_B_handler(dc.update_B)
         l.addWidget(dc)
         l.addWidget(options)
 
