@@ -59,7 +59,8 @@ class InputWidget(QtWidgets.QWidget):
             new_value = 0
         try:
             new_value = float(new_value)
-            self.slider.setValue(new_value)
+            if new_value <= self.slider.maximum():
+                self.slider.setValue(new_value)
             self.valueChanged.emit(new_value)
         except ValueError:
             pass
