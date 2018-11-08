@@ -14,7 +14,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 progname = os.path.basename("Lissajous")
-progversion = "0.1"
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
 
@@ -207,11 +206,13 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 Based on an example on how to embed matplotlib into a Python Qt Application \
 embedding_in_qt5.py by Florent Rougon, Darren Dale and Jenes H Nielsen""")
 
+def main():
+    qApp = QtWidgets.QApplication(sys.argv)
 
-qApp = QtWidgets.QApplication(sys.argv)
+    aw = ApplicationWindow()
+    aw.setWindowTitle("%s" % progname)
+    aw.show()
+    sys.exit(qApp.exec_())
 
-aw = ApplicationWindow()
-aw.setWindowTitle("%s" % progname)
-aw.show()
-sys.exit(qApp.exec_())
-#qApp.exec_()
+if __name__ == "__main__":
+    main()
