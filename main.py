@@ -57,9 +57,12 @@ class InputWidget(QtWidgets.QWidget):
     def line_edit_changed(self, new_value):
         if new_value is None or new_value is '':
             new_value = 0
-        new_value = float(new_value)
-        self.slider.setValue(new_value)
-        self.valueChanged.emit(new_value)
+        try:
+            new_value = float(new_value)
+            self.slider.setValue(new_value)
+            self.valueChanged.emit(new_value)
+        except ValueError:
+            pass
 
 class Options(QtWidgets.QWidget):
     def __init__(self, parent=None):
