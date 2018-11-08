@@ -6,18 +6,21 @@ from __future__ import unicode_literals
 import sys
 import os
 import matplotlib
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
-from numpy import arange, sin, pi, linspace
+from numpy import sin, pi, linspace
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-progname = os.path.basename("Lissajous")
+PROGRAM_NAME = os.path.basename("Lissajous")
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
 
 class LabeledInputLine(QtWidgets.QWidget):
+    """
+    Takes in user input inside a textbox. Consists of a label and textbox.
+    """
     def __init__(self, label_name, parent=None):
         QtWidgets.QWidget.__init__(self)
         layout = QtWidgets.QHBoxLayout(self)
@@ -29,6 +32,11 @@ class LabeledInputLine(QtWidgets.QWidget):
 
 
 class InputWidget(QtWidgets.QWidget):
+    """
+    Allows the user to input values in a textbox or a select them via a  slider.
+    Both the textbox and slider are synchronised to display the same value when
+    it is changed.
+    """
     valueChanged = QtCore.Signal(int)
     def __init__(self, label_name, slider_minimum, slider_maximum, default_value=0, parent=None):
         QtWidgets.QWidget.__init__(self)
@@ -50,10 +58,17 @@ class InputWidget(QtWidgets.QWidget):
         self.input_line.edit.setText(str(default_value))
 
     def slider_changed(self, new_value):
+        """
+        Updates textbox to display new_value and emits valueChanged(new_value)
+        """
         self.input_line.edit.setText(str(new_value))
         self.valueChanged.emit(new_value)
 
     def line_edit_changed(self, new_value):
+        """
+        Updates slider to display new_value if possible and emits
+        valueChanged(new_value).
+        """
         if new_value is None or new_value is '':
             new_value = 0
         try:
@@ -65,6 +80,11 @@ class InputWidget(QtWidgets.QWidget):
             pass
 
 class Options(QtWidgets.QWidget):
+    """
+    A QtWidget that allows the user to set multiple values with sliders
+    and textboxes. The modifiable values represent the coefficients of
+    a Lissajous equation.
+    """
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self)
         l = QtWidgets.QVBoxLayout(self)
@@ -80,18 +100,33 @@ class Options(QtWidgets.QWidget):
         l.addWidget(self.B_widget)
 
     def add_new_delta_handler(self, new_delta_handler):
+        """
+        Connects new_delta_handler to an event wich is fired when delta changes.
+        """
         self.delta_widget.valueChanged.connect(new_delta_handler)
 
     def add_new_a_handler(self, new_a_handler):
+        """
+        Connects new_a_handler to an event wich is fired when a changes.
+        """
         self.a_widget.valueChanged.connect(new_a_handler)
 
     def add_new_b_handler(self, new_b_handler):
+        """
+        Connects new_b_handler to an event wich is fired when b changes.
+        """
         self.b_widget.valueChanged.connect(new_b_handler)
 
     def add_new_A_handler(self, new_A_handler):
+        """
+        Connects new_A_handler to an event wich is fired when A changes.
+        """
         self.A_widget.valueChanged.connect(new_A_handler)
 
     def add_new_B_handler(self, new_B_handler):
+        """
+        Connects new_B_handler to an event wich is fired when B changes.
+        """
         self.B_widget.valueChanged.connect(new_B_handler)
 
 class MyMplCanvas(FigureCanvas):
@@ -112,6 +147,10 @@ class MyMplCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
     def compute_initial_figure(self):
+        """
+        This method should compute the initial parameters required for
+        visualising a figure.
+        """
         pass
 
 
@@ -128,11 +167,17 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.t = linspace(-pi, pi, 360)
 
     def compute_initial_figure(self):
+        """
+        Computes initial Lissajous curve with delta=0, A=1, B=1, a=1 and b=1.
+        """
         x = sin(linspace(-pi, pi, 360))
         y = sin(linspace(-pi, pi, 360))
         self.axes.plot(x, y, 'g')
 
     def update_figure(self):
+        """
+        Recomputes the Lissajous figure and redraws it.
+        """
         x = self.A * sin(self.a * self.t + self.delta)
         y = self.B * sin(self.b * self.t)
         self.axes.cla()
@@ -140,26 +185,45 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.draw()
 
     def update_delta(self, new_delta):
+        """
+        Sets delta = new_delta and redraws the canvas.
+        """
         self.delta = new_delta
         self.update_figure()
 
     def update_a(self, new_a):
+        """
+        Sets a = new_a and redraws the canvas.
+        """
         self.a = new_a
         self.update_figure()
 
     def update_b(self, new_b):
+        """
+        Sets b = new_b and redraws the canvas.
+        """
         self.b = new_b
         self.update_figure()
 
     def update_A(self, new_A):
+        """
+        Sets A = new_A and redraws the canvas.
+        """
         self.A = new_A
         self.update_figure()
 
     def update_B(self, new_B):
+        """
+        Sets B = new_B and redraws the canvas.
+        """
         self.B = new_B
         self.update_figure()
 
 class ApplicationWindow(QtWidgets.QMainWindow):
+    """
+    The main display, inside it there is a Lissajous visualization and options
+    to control it.
+    """
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -195,22 +259,29 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage("Lissajous curves visualization", 2000)
 
     def fileQuit(self):
+        """
+        Exits program
+        """
         self.close()
 
-    def closeEvent(self, ce):
-        self.fileQuit()
-
     def about(self):
+        """
+        Displays a messagebox explaining the purpose and origin of the program.
+        """
         QtWidgets.QMessageBox.about(self, "About",
                                     """Lissajous figures visualization
 Based on an example on how to embed matplotlib into a Python Qt Application \
 embedding_in_qt5.py by Florent Rougon, Darren Dale and Jenes H Nielsen""")
 
 def main():
+    """
+    Creates a windows inside which there is a grapth and a set of options to
+    control the displayed Lissajous figure.
+    """
     qApp = QtWidgets.QApplication(sys.argv)
 
     aw = ApplicationWindow()
-    aw.setWindowTitle("%s" % progname)
+    aw.setWindowTitle("%s" % PROGRAM_NAME)
     aw.show()
     sys.exit(qApp.exec_())
 
