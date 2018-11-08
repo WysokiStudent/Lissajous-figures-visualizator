@@ -194,21 +194,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.statusBar().showMessage("Lissajous curves visualization", 2000)
 
-    def delta_slider_changed(self, delta):
-        self.update_text_delta(delta)
-        self.update_display_delta(delta)
-
-    def delta_line_edit_changed(self, delta):
-        if delta is None or delta is '':
-            delta = 0
-        delta = float(delta)
-        while delta > 360:
-            delta -= 360
-        while delta < 0:
-            delta += 360
-        self.update_slider_delta(delta)
-        self.update_display_delta(delta)
-
     def fileQuit(self):
         self.close()
 
