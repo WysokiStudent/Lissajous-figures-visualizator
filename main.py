@@ -1,10 +1,11 @@
+"""
+A simple GUI application where the user can edit a displayed Lissajous courve
+"""
+
 from __future__ import unicode_literals
 import sys
 import os
-import random
 import matplotlib
-# Make sure that we are using QT5
-matplotlib.use('Qt5Agg')
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 
@@ -14,9 +15,11 @@ from matplotlib.figure import Figure
 
 progname = os.path.basename("Lissajous")
 progversion = "0.1"
+# Make sure that we are using QT5
+matplotlib.use('Qt5Agg')
 
 class LabeledInputLine(QtWidgets.QWidget):
-    def __init__(self, label_name, parent = None):
+    def __init__(self, label_name, parent=None):
         QtWidgets.QWidget.__init__(self)
         layout = QtWidgets.QHBoxLayout(self)
         self.label = QtWidgets.QLabel(self)
@@ -28,7 +31,7 @@ class LabeledInputLine(QtWidgets.QWidget):
 
 class InputWidget(QtWidgets.QWidget):
     valueChanged = QtCore.Signal(int)
-    def __init__(self, label_name, slider_minimum, slider_maximum, default_value = 0, parent = None):
+    def __init__(self, label_name, slider_minimum, slider_maximum, default_value=0, parent=None):
         QtWidgets.QWidget.__init__(self)
         layout = QtWidgets.QVBoxLayout(self)
 
@@ -59,7 +62,7 @@ class InputWidget(QtWidgets.QWidget):
         self.valueChanged.emit(new_value)
 
 class Options(QtWidgets.QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self)
         l = QtWidgets.QVBoxLayout(self)
         self.delta_widget = InputWidget("Delta", 0, 360, 0, self)
@@ -118,7 +121,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.b = 1 # different values of a/b
         self.A = 1
         self.B = 1
-        self.delta = pi / 2;
+        self.delta = pi / 2
         self.t = linspace(-pi, pi, 360)
 
     def compute_initial_figure(self):
@@ -196,9 +199,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         if delta is None or delta is '':
             delta = 0
         delta = float(delta)
-        while (delta > 360):
+        while delta > 360:
             delta -= 360
-        while (delta < 0):
+        while delta < 0:
             delta += 360
         self.update_slider_delta(delta)
         self.update_display_delta(delta)
