@@ -69,8 +69,6 @@ class InputWidget(QtWidgets.QWidget):
         Updates slider to display new_value if possible and emits
         valueChanged(new_value).
         """
-        if new_value is None or new_value is '':
-            new_value = 0
         try:
             new_value = float(new_value)
             if new_value <= self.slider.maximum():
@@ -159,8 +157,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def __init__(self, *args, **kwargs):
         MyMplCanvas.__init__(self, *args, **kwargs)
-        self.a = 1 # plotting the curves for
-        self.b = 1 # different values of a/b
+        self.a = 1
+        self.b = 1
         self.A = 1
         self.B = 1
         self.delta = pi / 2
