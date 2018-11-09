@@ -85,17 +85,17 @@ class Options(QtWidgets.QWidget):
     """
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self)
-        l = QtWidgets.QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
         self.delta_widget = InputWidget("Delta", 0, 360, 0, self)
-        l.addWidget(self.delta_widget)
+        layout.addWidget(self.delta_widget)
         self.a_widget = InputWidget("a", -10, 10, 1, self)
-        l.addWidget(self.a_widget)
+        layout.addWidget(self.a_widget)
         self.b_widget = InputWidget("b", -10, 10, 1, self)
-        l.addWidget(self.b_widget)
+        layout.addWidget(self.b_widget)
         self.A_widget = InputWidget("A", -10, 10, 1, self)
-        l.addWidget(self.A_widget)
+        layout.addWidget(self.A_widget)
         self.B_widget = InputWidget("B", -10, 10, 1, self)
-        l.addWidget(self.B_widget)
+        layout.addWidget(self.B_widget)
 
     def add_new_delta_handler(self, new_delta_handler):
         """
