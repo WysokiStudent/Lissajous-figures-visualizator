@@ -96,7 +96,7 @@ class Options(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         self.lissajous_equation = QtWidgets.QLabel("x=Asin(at + delta) y=Bsin(bt)")
         layout.addWidget(self.lissajous_equation)
-        self.delta_widget = InputWidget("Delta", 0, 360, self)
+        self.delta_widget = InputWidget("delta", 0, 360, self)
         self.delta_widget.set_value(0)
         layout.addWidget(self.delta_widget)
         self.a_widget = InputWidget("a", -10, 10, self)
