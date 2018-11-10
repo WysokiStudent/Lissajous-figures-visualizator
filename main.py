@@ -182,7 +182,7 @@ class DynamicCanvas(MatplotlibCanvas):
         self.A = 1
         self.B = 1
         self.delta = pi / 2
-        self.t = linspace(-pi, pi, 360)
+        self.time_points = linspace(-pi, pi, 360)
 
     def compute_initial_figure(self):
         """
@@ -196,8 +196,8 @@ class DynamicCanvas(MatplotlibCanvas):
         """
         Recomputes the Lissajous figure and redraws it.
         """
-        x = self.A * sin(self.a * self.t + self.delta)
-        y = self.B * sin(self.b * self.t)
+        x = self.A * sin(self.a * self.time_points + self.delta)
+        y = self.B * sin(self.b * self.time_points)
         self.axes.cla()
         self.axes.plot(x, y, 'g')
         self.draw()
