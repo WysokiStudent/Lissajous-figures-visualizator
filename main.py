@@ -86,8 +86,7 @@ class Options(QtWidgets.QWidget):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self)
         layout = QtWidgets.QVBoxLayout(self)
-        delta = chr(0x0394)
-        self.lissajous_equation = QtWidgets.QLabel("x=Asin(at + " + delta + ") y=Bsin(bt)")
+        self.lissajous_equation = QtWidgets.QLabel("x=Asin(at + delta) y=Bsin(bt)")
         layout.addWidget(self.lissajous_equation)
         self.delta_widget = InputWidget("Delta", 0, 360, 0, self)
         layout.addWidget(self.delta_widget)
