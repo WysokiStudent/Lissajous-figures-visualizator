@@ -23,6 +23,7 @@ class LabeledInputLine(QtWidgets.QWidget):
     """
     def __init__(self, label_name, parent=None):
         QtWidgets.QWidget.__init__(self)
+        self.setParent(parent)
         layout = QtWidgets.QHBoxLayout(self)
         self.label = QtWidgets.QLabel(self)
         self.label.setText(label_name)
@@ -40,6 +41,7 @@ class InputWidget(QtWidgets.QWidget):
     valueChanged = QtCore.Signal(int)
     def __init__(self, label_name, slider_minimum, slider_maximum, default_value=0, parent=None):
         QtWidgets.QWidget.__init__(self)
+        self.setParent(parent)
         layout = QtWidgets.QVBoxLayout(self)
 
         self.input_line = LabeledInputLine(label_name, self)
@@ -85,6 +87,7 @@ class Options(QtWidgets.QWidget):
     """
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self)
+        self.setParent(parent)
         layout = QtWidgets.QVBoxLayout(self)
         self.lissajous_equation = QtWidgets.QLabel("x=Asin(at + delta) y=Bsin(bt)")
         layout.addWidget(self.lissajous_equation)
