@@ -86,15 +86,18 @@ class Options(QtWidgets.QWidget):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self)
         layout = QtWidgets.QVBoxLayout(self)
+        delta = chr(0x0394)
+        self.lissajous_equation = QtWidgets.QLabel("x=Asin(at + " + delta + ") y=Bsin(bt)")
+        layout.addWidget(self.lissajous_equation)
         self.delta_widget = InputWidget("Delta", 0, 360, 0, self)
         layout.addWidget(self.delta_widget)
         self.a_widget = InputWidget("a", -10, 10, 1, self)
         layout.addWidget(self.a_widget)
         self.b_widget = InputWidget("b", -10, 10, 1, self)
         layout.addWidget(self.b_widget)
-        self.A_widget = InputWidget("A", -10, 10, 1, self)
+        self.A_widget = InputWidget("A", 0, 10, 1, self)
         layout.addWidget(self.A_widget)
-        self.B_widget = InputWidget("B", -10, 10, 1, self)
+        self.B_widget = InputWidget("B", 0, 10, 1, self)
         layout.addWidget(self.B_widget)
 
     def add_new_delta_handler(self, new_delta_handler):
