@@ -39,7 +39,7 @@ class InputWidget(QtWidgets.QWidget):
     it is changed.
     """
     valueChanged = QtCore.Signal(int)
-    def __init__(self, label_name, slider_minimum, slider_maximum, default_value=0, parent=None):
+    def __init__(self, label_name, slider_minimum, slider_maximum, parent=None):
         QtWidgets.QWidget.__init__(self)
         self.setParent(parent)
         layout = QtWidgets.QVBoxLayout(self)
@@ -52,21 +52,18 @@ class InputWidget(QtWidgets.QWidget):
         self.slider.setSingleStep(1)
         self.slider.setMinimum(slider_minimum)
         self.slider.setMaximum(slider_maximum)
-        self.input_line.edit.textChanged.connect(self.line_edit_changed)
-        self.slider.valueChanged.connect(self.slider_changed)
+        self.input_line.edit.textChanged.connect(self.update_slider)
+        self.slider.valueChanged.connect(self.update_textbox)
         layout.addWidget(self.slider)
 
-        self.slider.setValue(default_value)
-        self.input_line.edit.setText(str(default_value))
-
-    def slider_changed(self, new_value):
+    def update_textbox(self, new_value):
         """
         Updates textbox to display new_value and emits valueChanged(new_value)
         """
         self.input_line.edit.setText(str(new_value))
         self.valueChanged.emit(new_value)
 
-    def line_edit_changed(self, new_value):
+    def update_slider(self, new_value):
         """
         Updates slider to display new_value if possible and emits
         valueChanged(new_value).
@@ -78,6 +75,14 @@ class InputWidget(QtWidgets.QWidget):
             self.valueChanged.emit(new_value)
         except ValueError:
             pass
+
+    def set_value(self, new_value):
+        """
+        Sets the values of the textbox and slider.
+        """
+        self.input_line.edit.setText(str(new_value))
+        self.slider.setValue(new_value)
+        self.valueChanged.emit(new_value)
 
 class Options(QtWidgets.QWidget):
     """
@@ -91,15 +96,20 @@ class Options(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         self.lissajous_equation = QtWidgets.QLabel("x=Asin(at + delta) y=Bsin(bt)")
         layout.addWidget(self.lissajous_equation)
-        self.delta_widget = InputWidget("Delta", 0, 360, 0, self)
+        self.delta_widget = InputWidget("Delta", 0, 360, self)
+        self.delta_widget.set_value(0)
         layout.addWidget(self.delta_widget)
-        self.a_widget = InputWidget("a", -10, 10, 1, self)
+        self.a_widget = InputWidget("a", -10, 10, self)
+        self.a_widget.set_value(1)
         layout.addWidget(self.a_widget)
-        self.b_widget = InputWidget("b", -10, 10, 1, self)
+        self.b_widget = InputWidget("b", -10, 10, self)
+        self.b_widget.set_value(1)
         layout.addWidget(self.b_widget)
-        self.A_widget = InputWidget("A", 0, 10, 1, self)
+        self.A_widget = InputWidget("A", 0, 10, self)
+        self.A_widget.set_value(1)
         layout.addWidget(self.A_widget)
-        self.B_widget = InputWidget("B", 0, 10, 1, self)
+        self.B_widget = InputWidget("B", 0, 10, self)
+        self.B_widget.set_value(1)
         layout.addWidget(self.B_widget)
 
     def add_new_delta_handler(self, new_delta_handler):
