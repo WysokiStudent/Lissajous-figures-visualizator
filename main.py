@@ -2,16 +2,16 @@
 A simple GUI application where the user can edit a displayed Lissajous courve
 """
 
-from __future__ import unicode_literals
 import sys
 import os
-import matplotlib
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 
-from numpy import sin, pi, linspace
+import matplotlib
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+
+from numpy import sin, pi, linspace
 
 PROGRAM_NAME = os.path.basename("Lissajous")
 # Make sure that we are using QT5
