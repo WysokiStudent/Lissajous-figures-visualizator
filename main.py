@@ -129,8 +129,10 @@ class Options(QtWidgets.QWidget):
         """
         self.B_widget.valueChanged.connect(new_B_handler)
 
-class MyMplCanvas(FigureCanvas):
-    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+class MatplotlibCanvas(FigureCanvas):
+    """
+    Abstract class for simplifing the usage of Matplotlib's canvas from Qt.
+    """
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -154,11 +156,14 @@ class MyMplCanvas(FigureCanvas):
         pass
 
 
-class MyDynamicMplCanvas(MyMplCanvas):
-    """A canvas that updates itself every second with a new plot."""
+class DynamicCanvas(MatplotlibCanvas):
+    """
+    A canvas that updates itself with a new plot when the curves parameters
+    change.
+    """
 
     def __init__(self, *args, **kwargs):
-        MyMplCanvas.__init__(self, *args, **kwargs)
+        MatplotlibCanvas.__init__(self, *args, **kwargs)
         self.a = 1
         self.b = 1
         self.A = 1
@@ -230,7 +235,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("application main window")
 
         self.file_menu = QtWidgets.QMenu('&File', self)
-        self.file_menu.addAction('&Quit', self.fileQuit,
+        self.file_menu.addAction('&Quit', self.quit_program,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
@@ -242,23 +247,23 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.main_widget = QtWidgets.QWidget(self)
 
-        l = QtWidgets.QHBoxLayout(self.main_widget)
-        dc = MyDynamicMplCanvas(self.main_widget, width=5, height=4, dpi=100)
-        options = Options(dc)
-        options.add_new_delta_handler(dc.update_delta)
-        options.add_new_a_handler(dc.update_a)
-        options.add_new_b_handler(dc.update_b)
-        options.add_new_A_handler(dc.update_A)
-        options.add_new_B_handler(dc.update_B)
-        l.addWidget(dc)
-        l.addWidget(options)
+        layout = QtWidgets.QHBoxLayout(self.main_widget)
+        lissajous_canvas = DynamicCanvas(self.main_widget, width=5, height=4, dpi=100)
+        options = Options(lissajous_canvas)
+        options.add_new_delta_handler(lissajous_canvas.update_delta)
+        options.add_new_a_handler(lissajous_canvas.update_a)
+        options.add_new_b_handler(lissajous_canvas.update_b)
+        options.add_new_A_handler(lissajous_canvas.update_A)
+        options.add_new_B_handler(lissajous_canvas.update_B)
+        layout.addWidget(lissajous_canvas)
+        layout.addWidget(options)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
 
         self.statusBar().showMessage("Lissajous curves visualization", 2000)
 
-    def fileQuit(self):
+    def quit_program(self):
         """
         Exits program
         """
@@ -278,12 +283,12 @@ def main():
     Creates a windows inside which there is a grapth and a set of options to
     control the displayed Lissajous figure.
     """
-    qApp = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
 
-    aw = ApplicationWindow()
-    aw.setWindowTitle("%s" % PROGRAM_NAME)
-    aw.show()
-    sys.exit(qApp.exec_())
+    application_window = ApplicationWindow()
+    application_window.setWindowTitle("%s" % PROGRAM_NAME)
+    application_window.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
