@@ -95,6 +95,7 @@ class Options(QtWidgets.QWidget):
         self.setParent(parent)
         layout = QtWidgets.QVBoxLayout(self)
         self.lissajous_equation = QtWidgets.QLabel("x=Asin(at + delta) y=Bsin(bt)")
+        self.lissajous_equation.setAlignment(Qt.AlignHCenter)
         layout.addWidget(self.lissajous_equation)
         self.delta_widget = InputWidget("delta", 0, 360, self)
         self.delta_widget.set_value(0)
